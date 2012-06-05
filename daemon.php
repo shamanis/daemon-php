@@ -57,6 +57,7 @@ abstract class DaemonPHP {
     * в которую будет выполнен chroot после старта демона.
     * Данный метод служит для решения проблем безопасности.
     * @param string $path Абсолютный путь chroot-директории 
+    * @throws DaemonException
     */
     final public function setChroot($path) {
         if (!function_exists('chroot')) {
@@ -68,6 +69,7 @@ abstract class DaemonPHP {
     
     /**
     * Метод выполняет демонизацию процесса, через double fork
+    * @throws DaemonException
     */
     final protected function demonize() {
         $pid = pcntl_fork();
@@ -114,7 +116,7 @@ abstract class DaemonPHP {
     
     /**
     * Метод возвращает PID процесса
-    * @return int PID процесса
+    * @return int PID процесса либо 0
     */
     final protected function getPID() {
         if (file_exists($this->_pid)) {
@@ -178,6 +180,7 @@ abstract class DaemonPHP {
     
     /**
     * Метод обрабатывает аргументы командной строки
+    * @param array $argv Массив с аргументами коммандной строки
     */
     final public function handle($argv) {
         switch ($argv[1]) {
