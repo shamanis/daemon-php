@@ -116,11 +116,17 @@ abstract class DaemonPHP {
     * @return int PID процесса
     */
     final protected function getPID() {
-        if (is_readable($this->_pid)) {
-            $fpid = (int) file_get_contents($this->_pid);
-            return $fpid;
+        if (file_exists($this->_pid)) {
+            $pid = (int) file_get_contents($this->_pid);
+            if (posix_kill($pid, 0)) {
+                return $pid;
+            } else {
+                //Если демон не откликается, а PID-файл существует
+                unlink($this->_pid);
+                return 0;
+            }
         } else {
-            throw new DaemonException('PID-file is not readable!');
+            return 0;
         }
     }
     
@@ -128,13 +134,9 @@ abstract class DaemonPHP {
     * Метод стартует работу и вызывает метод demonize()
     */
     final public function start() {
-        if (file_exists($this->_pid) && posix_kill($this->getPID(), 0)) {
-            echo "Process is running on PID: " . $this->getPID() . PHP_EOL;
+        if (($pid = $this->getPID()) > 0) {
+            echo "Process is running on PID: " . $pid . PHP_EOL;
         } else {
-            if (file_exists($this->_pid)) {
-                //Если демон не отвечает, а PID-файл существует
-                unlink($this->_pid);
-            }
             echo "Starting..." . PHP_EOL;
             $this->demonize();
         }
@@ -144,16 +146,12 @@ abstract class DaemonPHP {
     * Метод останавливает демон
     */
     final public function stop() {
-        if (file_exists($this->_pid) && posix_kill($this->getPID(), 0)) {
+        if (($pid = $this->getPID()) > 0) {
             echo "Stopping ... ";
-            posix_kill($this->getPID(), SIGTERM);
+            posix_kill($pid, SIGTERM);
             unlink($this->_pid);
             echo "OK" . PHP_EOL;
         } else {
-            if (file_exists($this->_pid)) {
-                //Если демон не отвечает, а PID-файл существует
-                unlink($this->_pid);
-            }
             echo "Process not running!" . PHP_EOL;
         }
     }
@@ -170,13 +168,9 @@ abstract class DaemonPHP {
     * Метод проверяет работу демона
     */
     final public function status() {
-        if (file_exists($this->_pid) && posix_kill($this->getPID(), 0)) {
-            echo "Process is running on PID: " . $this->getPID() . PHP_EOL;
+        if (($pid = $this->getPID()) > 0) {
+            echo "Process is running on PID: " . $pid . PHP_EOL;
         } else {
-            if (file_exists($this->_pid)) {
-                //Если демон не отвечает, а PID-файл существует
-                unlink($this->_pid);
-            }
             echo "Process not running!" . PHP_EOL;
         }
     }
