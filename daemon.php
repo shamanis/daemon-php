@@ -58,6 +58,9 @@ abstract class DaemonPHP {
     * @param string $path Абсолютный путь chroot-директории 
     */
     final public function setChroot($path) {
+        if (function_exists('chroot') {
+            throw new DaemonException('Function chroot() has no. Please update you PHP version.');
+        }
         $this->_chrootDir = $path;
         return $this;
     }
