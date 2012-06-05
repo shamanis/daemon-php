@@ -3,6 +3,7 @@
 Author: Petr Bondarenko
 E-mail: public@shamanis.com
 Date: 31 May 2012
+License: BSD
 Description: Class for create UNIX-daemon
 */
 
