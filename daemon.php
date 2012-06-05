@@ -134,7 +134,7 @@ abstract class DaemonPHP {
     final protected function getPID() {
         if (file_exists($this->_pid)) {
             $pid = (int) file_get_contents($this->_pid);
-            if (posix_kill($pid, 0)) {
+            if (posix_kill($pid, SIG_DFL)) {
                 return $pid;
             } else {
                 //Если демон не откликается, а PID-файл существует
