@@ -9,6 +9,13 @@ Description: Class for create UNIX-daemon
 
 class DaemonException extends Exception {}
 
+/**
+* Класс для реализации UNIX-демонов
+* @author Petr Bondarenko
+* @copyright Petr Bondarenko 2012
+* @version 1.0
+* @abstract
+*/
 abstract class DaemonPHP {
 
     protected $_baseDir;
@@ -20,6 +27,7 @@ abstract class DaemonPHP {
     /**
     * Конструктор класса. Принимает путь к pid-файлу
     * @param string $path Абсолютный путь к PID-файлу
+    * @access public
     */
     public function __construct($path=null) {
         $this->_baseDir = dirname(__FILE__);
@@ -36,6 +44,7 @@ abstract class DaemonPHP {
     * Метод устанавливает путь log-файла
     * @param string $path Абсолютный путь к log-файлу
     * @return DaemonPHP
+    * @access public
     */
     final public function setLog($path) {
         $this->_log = $path;
@@ -46,6 +55,7 @@ abstract class DaemonPHP {
     * Метод устанавливает путь err-файла
     * @param string $path Абсолютный путь к err-файлу
     * @return DaemonPHP
+    * @access public
     */
     final public function setErr($path) {
         $this->_err = $path;
@@ -58,6 +68,7 @@ abstract class DaemonPHP {
     * Данный метод служит для решения проблем безопасности.
     * @param string $path Абсолютный путь chroot-директории 
     * @throws DaemonException
+    * @access public
     */
     final public function setChroot($path) {
         if (!function_exists('chroot')) {
@@ -70,6 +81,7 @@ abstract class DaemonPHP {
     /**
     * Метод выполняет демонизацию процесса, через double fork
     * @throws DaemonException
+    * @access protected
     */
     final protected function demonize() {
         $pid = pcntl_fork();
@@ -117,6 +129,7 @@ abstract class DaemonPHP {
     /**
     * Метод возвращает PID процесса
     * @return int PID процесса либо 0
+    * @access protected
     */
     final protected function getPID() {
         if (file_exists($this->_pid)) {
@@ -135,6 +148,7 @@ abstract class DaemonPHP {
     
     /**
     * Метод стартует работу и вызывает метод demonize()
+    * @access public
     */
     final public function start() {
         if (($pid = $this->getPID()) > 0) {
@@ -147,6 +161,7 @@ abstract class DaemonPHP {
     
     /**
     * Метод останавливает демон
+    * @access public
     */
     final public function stop() {
         if (($pid = $this->getPID()) > 0) {
@@ -161,6 +176,9 @@ abstract class DaemonPHP {
     
     /**
     * Метод рестартует демон последовательно вызвав stop() и start()
+    * @see start()
+    * @see stop()
+    * @access public
     */
     final public function restart() {
         $this->stop();
@@ -169,6 +187,7 @@ abstract class DaemonPHP {
     
     /**
     * Метод проверяет работу демона
+    * @access public
     */
     final public function status() {
         if (($pid = $this->getPID()) > 0) {
@@ -181,6 +200,7 @@ abstract class DaemonPHP {
     /**
     * Метод обрабатывает аргументы командной строки
     * @param array $argv Массив с аргументами коммандной строки
+    * @access public
     */
     final public function handle($argv) {
         switch ($argv[1]) {
@@ -206,6 +226,8 @@ abstract class DaemonPHP {
     /**
     * Основной класс демона, в котором выполняется работа.
     * Его необходимо переопределить
+    * @access public
+    * @abstract
     */
     abstract public function run();
 }
